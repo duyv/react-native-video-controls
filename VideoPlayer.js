@@ -12,6 +12,7 @@ import {
   Image,
   View,
   Text,
+  I18nManager
 } from 'react-native';
 import padStart from 'lodash/padStart';
 
@@ -31,8 +32,6 @@ export default class VideoPlayer extends Component {
     volume: 1,
     title: '',
     rate: 1,
-    showTimeRemaining: true,
-    showHours: false,
   };
 
   constructor(props) {
@@ -53,8 +52,7 @@ export default class VideoPlayer extends Component {
 
       isFullscreen:
         this.props.isFullScreen || this.props.resizeMode === 'cover' || false,
-      showTimeRemaining: this.props.showTimeRemaining,
-      showHours: this.props.showHours,
+      showTimeRemaining: true,
       volumeTrackWidth: 0,
       volumeFillWidth: 0,
       seekerFillWidth: 0,
@@ -161,15 +159,6 @@ export default class VideoPlayer extends Component {
     };
   }
 
-  componentDidUpdate = prevProps => {
-    const {isFullscreen} = this.props;
-
-    if (prevProps.isFullscreen !== isFullscreen) {
-      this.setState({
-        isFullscreen,
-      });
-    }
-  };
   /**
     | -------------------------------------------------------
     | Events
@@ -565,22 +554,10 @@ export default class VideoPlayer extends Component {
     const symbol = this.state.showRemainingTime ? '-' : '';
     time = Math.min(Math.max(time, 0), this.state.duration);
 
-    if (!this.state.showHours) {
-      const formattedMinutes = padStart(Math.floor(time / 60).toFixed(0), 2, 0);
-      const formattedSeconds = padStart(Math.floor(time % 60).toFixed(0), 2, 0);
-
-      return `${symbol}${formattedMinutes}:${formattedSeconds}`;
-    }
-
-    const formattedHours = padStart(Math.floor(time / 3600).toFixed(0), 2, 0);
-    const formattedMinutes = padStart(
-      (Math.floor(time / 60) % 60).toFixed(0),
-      2,
-      0,
-    );
+    const formattedMinutes = padStart(Math.floor(time / 60).toFixed(0), 2, 0);
     const formattedSeconds = padStart(Math.floor(time % 60).toFixed(0), 2, 0);
 
-    return `${symbol}${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+    return `${symbol}${formattedMinutes}:${formattedSeconds}`;
   }
 
   /**
@@ -991,7 +968,7 @@ export default class VideoPlayer extends Component {
     return this.renderControl(
       <Image
         source={require('./assets/img/back.png')}
-        style={styles.controls.back}
+        style={[styles.controls.back, {transform: [{scaleX: I18nManager.isRTL ? -1 : 1}]}]}
       />,
       this.events.onBack,
       styles.controls.back,
@@ -1359,11 +1336,13 @@ const styles = {
     },
     fullscreen: {
       flexDirection: 'row',
+      
     },
     playPause: {
       position: 'relative',
       width: 80,
       zIndex: 0,
+      transform: [{scaleX: I18nManager.isRTL ? -1 : 1}]
     },
     title: {
       alignItems: 'center',
@@ -1382,6 +1361,7 @@ const styles = {
       color: '#FFF',
       fontSize: 11,
       textAlign: 'right',
+      transform: [{scaleX: I18nManager.isRTL ? -1 : 1}]
     },
   }),
   volume: StyleSheet.create({
@@ -1411,6 +1391,7 @@ const styles = {
     },
     icon: {
       marginLeft: 7,
+      transform: [{scaleX: I18nManager.isRTL ? -1 : 1}]
     },
   }),
   seekbar: StyleSheet.create({
