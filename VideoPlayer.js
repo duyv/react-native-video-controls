@@ -12,7 +12,7 @@ import {
   Image,
   View,
   Text,
-  I18nManager
+  I18nManager,
 } from 'react-native';
 import padStart from 'lodash/padStart';
 
@@ -772,7 +772,9 @@ export default class VideoPlayer extends Component {
       onPanResponderGrant: (evt, gestureState) => {
         let state = this.state;
         this.clearControlTimeout();
-        const position = evt.nativeEvent.locationX;
+        const position = I18nManager.isRTL
+          ? this.player.seekerWidth - evt.nativeEvent.locationX
+          : evt.nativeEvent.locationX;
         this.setSeekerPosition(position);
         state.seeking = true;
         state.originallyPaused = state.paused;
@@ -968,7 +970,10 @@ export default class VideoPlayer extends Component {
     return this.renderControl(
       <Image
         source={require('./assets/img/back.png')}
-        style={[styles.controls.back, {transform: [{scaleX: I18nManager.isRTL ? -1 : 1}]}]}
+        style={[
+          styles.controls.back,
+          {transform: [{scaleX: I18nManager.isRTL ? -1 : 1}]},
+        ]}
       />,
       this.events.onBack,
       styles.controls.back,
@@ -1064,7 +1069,7 @@ export default class VideoPlayer extends Component {
         {...this.player.seekPanResponder.panHandlers}>
         <View
           style={styles.seekbar.track}
-          onLayout={event =>
+          onLayout={(event) =>
             (this.player.seekerWidth = event.nativeEvent.layout.width)
           }
           pointerEvents={'none'}>
@@ -1194,7 +1199,7 @@ export default class VideoPlayer extends Component {
         <View style={[styles.player.container, this.styles.containerStyle]}>
           <Video
             {...this.props}
-            ref={videoPlayer => (this.player.ref = videoPlayer)}
+            ref={(videoPlayer) => (this.player.ref = videoPlayer)}
             resizeMode={this.state.resizeMode}
             volume={this.state.volume}
             paused={this.state.paused}
@@ -1336,13 +1341,12 @@ const styles = {
     },
     fullscreen: {
       flexDirection: 'row',
-      
     },
     playPause: {
       position: 'relative',
       width: 80,
       zIndex: 0,
-      transform: [{scaleX: I18nManager.isRTL ? -1 : 1}]
+      transform: [{scaleX: I18nManager.isRTL ? -1 : 1}],
     },
     title: {
       alignItems: 'center',
@@ -1361,7 +1365,7 @@ const styles = {
       color: '#FFF',
       fontSize: 11,
       textAlign: 'right',
-      transform: [{scaleX: I18nManager.isRTL ? -1 : 1}]
+      transform: [{scaleX: I18nManager.isRTL ? -1 : 1}],
     },
   }),
   volume: StyleSheet.create({
@@ -1391,7 +1395,7 @@ const styles = {
     },
     icon: {
       marginLeft: 7,
-      transform: [{scaleX: I18nManager.isRTL ? -1 : 1}]
+      transform: [{scaleX: I18nManager.isRTL ? -1 : 1}],
     },
   }),
   seekbar: StyleSheet.create({
